@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UOU Student · 통합 학생 정보 플랫폼</title>
+  <style>
+    :root{
+      --navy:#12345b;--navy-2:#1c4d7f;--blue:#2d6ca2;--bg:#f5f7fb;--card:#fff;
+      --line:#e5e9f0;--text:#182230;--muted:#687386;--soft:#eef3f8;--danger:#b42318;
+      --green:#157347;--shadow:0 8px 24px rgba(22,34,51,.08);--radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, Pretendard, "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    a{text-decoration:none;color:inherit}
+    .app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}
+    .sidebar{background:linear-gradient(180deg,#102d4e,#173f69);color:#fff;padding:24px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:26px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:20px;letter-spacing:-.02em}
+    .brand-badge{width:40px;height:40px;border-radius:12px;background:#fff;color:var(--navy);display:grid;place-items:center;font-weight:900}
+    .nav{display:grid;gap:8px}
+    .nav button{border:0;background:transparent;color:#dbe7f3;padding:12px 14px;border-radius:12px;text-align:left;font-weight:700}
+    .nav button:hover,.nav button.active{background:rgba(255,255,255,.14);color:#fff}
+    .sidebar-note{margin-top:auto;font-size:12px;line-height:1.6;color:#c2d2e4;background:rgba(255,255,255,.08);padding:14px;border-radius:14px}
+    .main{min-width:0}
+    .topbar{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:10}
+    .topbar-title{font-weight:800}.demo-badge{font-size:12px;font-weight:800;padding:7px 10px;border-radius:999px;background:#fff4cc;color:#775b00;border:1px solid #f5d56e}
+    .content{padding:30px;max-width:1400px;margin:0 auto}
+    .page{display:none}.page.active{display:block}
+    .hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:24px}.hero h1{margin:0 0 6px;font-size:30px;letter-spacing:-.03em}.hero p{margin:0;color:var(--muted)}
+    .grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+    .card h2,.card h3{margin:0}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.section-title{font-size:18px;font-weight:800}.subtle{color:var(--muted);font-size:14px}
+    .next-card{background:linear-gradient(135deg,#12345b,#1c4d7f);color:#fff;padding:24px;min-height:210px}.next-card .subtle{color:#cfe0ef}.next-time{font-size:34px;font-weight:900;margin:12px 0 4px}.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#eef3f8;color:var(--navy)}
+    .next-card .pill{background:rgba(255,255,255,.15);color:#fff}.list{display:grid;gap:10px}.list-item{padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff}.list-item.clickable:hover{border-color:#b8c9da;background:#fafcff}.row{display:flex;justify-content:space-between;align-items:center;gap:14px}.meta{font-size:13px;color:var(--muted);margin-top:4px}.dday{font-weight:900;color:var(--navy)}
+    .quick-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}.quick-btn{border:1px solid var(--line);background:#fff;border-radius:14px;padding:14px;font-weight:800}.quick-btn:hover{border-color:#9fb7ce;background:#f9fbfd}
+    .notice-banner{margin-bottom:18px;padding:14px 16px;border:1px solid #f3d16a;background:#fff8db;color:#6e5600;border-radius:14px;font-size:13px}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}.input,.select{border:1px solid #ccd5df;background:#fff;border-radius:12px;padding:10px 12px;outline:none}.input:focus,.select:focus{border-color:#557fa7;box-shadow:0 0 0 3px rgba(45,108,162,.12)}
+    .btn{border:0;border-radius:12px;padding:10px 14px;font-weight:800}.btn.primary{background:var(--navy);color:#fff}.btn.secondary{background:#edf2f7;color:var(--navy)}.btn.danger{background:#fff0ef;color:var(--danger);border:1px solid #f4c7c3}.btn.ghost{background:#fff;border:1px solid var(--line)}
+    .timetable-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff}.timetable{min-width:920px;display:grid;grid-template-columns:72px repeat(5,1fr)}
+    .time-head,.day-head{padding:12px;border-bottom:1px solid var(--line);font-weight:800;background:#f8fafc;position:sticky;top:0;z-index:2}.day-head{text-align:center}.time-col,.day-col{position:relative;height:720px;border-right:1px solid var(--line)}
+    .time-label{position:absolute;right:8px;transform:translateY(-50%);font-size:12px;color:var(--muted)}.hour-line{position:absolute;left:0;right:0;border-top:1px solid #eef1f4}
+    .course-block{position:absolute;left:6px;right:6px;border-radius:12px;padding:9px 10px;color:#fff;font-size:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.12);cursor:pointer}.course-block strong{display:block;font-size:13px;margin-bottom:3px}
+    .course-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}.course-card{transition:.15s}.course-card:hover{transform:translateY(-2px);border-color:#b9c8d8}.course-card h3{margin-bottom:8px}.course-stat{display:flex;gap:10px;margin-top:14px}.stat{flex:1;background:#f6f8fb;padding:10px;border-radius:12px;text-align:center;font-size:12px}.stat strong{display:block;font-size:18px;color:var(--navy)}
+    .tabs{display:flex;gap:8px;margin-bottom:16px}.tab{border:1px solid var(--line);background:#fff;padding:9px 12px;border-radius:10px;font-weight:800}.tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .map-layout{display:grid;grid-template-columns:330px 1fr;gap:18px}.building-list{display:grid;gap:10px;max-height:560px;overflow:auto}.building-item{border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;text-align:left}.building-item.active{border-color:#5b83aa;background:#eef5fb}.map-box{min-height:520px;position:relative;background:repeating-linear-gradient(0deg,#f4f7fa 0 39px,#e8edf2 40px),repeating-linear-gradient(90deg,transparent 0 59px,#edf1f4 60px);border:1px dashed #b8c4cf;border-radius:16px;overflow:hidden}.map-label{position:absolute;transform:translate(-50%,-50%);padding:10px 12px;background:#fff;border:1px solid #cad4df;border-radius:12px;box-shadow:var(--shadow);font-size:12px;font-weight:800}.map-label.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .empty{padding:28px;text-align:center;border:1px dashed #ccd5df;border-radius:14px;color:var(--muted);background:#fafbfc}.modal-backdrop{position:fixed;inset:0;background:rgba(8,18,30,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal-backdrop.show{display:flex}.modal{width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.25)}.modal h2{margin:0 0 16px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:6px}.field label{font-size:13px;font-weight:800}.field.full{grid-column:1/-1}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.toast{position:fixed;right:22px;bottom:22px;background:#142b45;color:#fff;padding:12px 16px;border-radius:12px;opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:70}.toast.show{opacity:1;transform:translateY(0)}
+    .mobile-nav{display:none}
+    @media(max-width:980px){.app{grid-template-columns:1fr}.sidebar{display:none}.content{padding:22px}.grid-2{grid-template-columns:1fr}.map-layout{grid-template-columns:1fr}.mobile-nav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:12px;right:12px;bottom:12px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);z-index:30;padding:6px}.mobile-nav button{border:0;background:transparent;padding:10px 6px;border-radius:10px;font-size:12px;font-weight:800;color:var(--muted)}.mobile-nav button.active{background:#eef4f9;color:var(--navy)}.content{padding-bottom:100px}}
+    @media(max-width:680px){.topbar{padding:0 16px}.hero{display:block}.hero h1{font-size:25px}.content{padding:18px 14px 100px}.grid-3,.quick-actions{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.card{padding:16px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-badge">U</div><div>UOU Student</div></div>
+    <nav class="nav" id="sideNav">
+      <button data-page="dashboard" class="active">🏠 홈</button>
+      <button data-page="timetable">📅 시간표</button>
+      <button data-page="courses">📚 강의 정보</button>
+      <button data-page="campus">📍 캠퍼스맵</button>
+    </nav>
+    <div class="sidebar-note">이 웹사이트의 강의·공지·과제·건물 정보는 모두 프로토타입용 샘플 데이터입니다. 실제 울산대학교 공식 정보가 아닙니다.</div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="topbarTitle">통합 학생 정보 플랫폼</div>
+      <div class="demo-badge">DEMO DATA</div>
+    </header>
+
+    <div class="content">
+      <section id="dashboard" class="page active">
+        <div class="hero"><div><h1 id="todayTitle">오늘</h1><p>오늘 필요한 수업과 과제를 한 번에 확인하세요.</p></div></div>
+        <div class="notice-banner">※ 현재 표시되는 강의·공지·과제 정보는 서비스 시연을 위한 샘플 데이터입니다.</div>
+        <div class="grid-2">
+          <div class="card next-card" id="nextClassCard"></div>
+          <div class="card"><div class="section-head"><div class="section-title">오늘의 시간표</div><button class="btn ghost" data-jump="timetable">전체 보기</button></div><div id="todaySchedule" class="list"></div></div>
+        </div>
+        <div class="grid-2" style="margin-top:20px">
+          <div class="card"><div class="section-head"><div class="section-title">마감 예정 과제</div><span class="subtle">가까운 순</span></div><div id="assignmentList" class="list"></div></div>
+          <div class="card"><div class="section-head"><div class="section-title">최근 강의 공지</div><span class="subtle">샘플</span></div><div id="noticeList" class="list"></div></div>
+        </div>
+        <div class="quick-actions">
+          <button class="quick-btn" data-jump="timetable">📅 전체 시간표 보기</button>
+          <button class="quick-btn" data-jump="courses">📚 강의 정보 보기</button>
+          <button class="quick-btn" data-jump="campus">📍 캠퍼스맵 보기</button>
+        </div>
+      </section>
+
+      <section id="timetable" class="page">
+        <div class="hero"><div><h1>주간 시간표</h1><p>월요일부터 금요일까지의 수업을 확인하고 직접 편집할 수 있습니다.</p></div></div>
+        <div class="notice-banner">※ 시간표는 프로토타입용 샘플 데이터입니다. 추가·수정·삭제 내용은 이 브라우저에 저장됩니다.</div>
+        <div class="toolbar">
+          <button class="btn primary" id="addCourseBtn">+ 강의 추가</button>
+          <button class="btn secondary" id="resetCoursesBtn">샘플 시간표로 초기화</button>
+        </div>
+        <div class="timetable-wrap"><div class="timetable" id="timetableGrid"></div></div>
+      </section>
+
+      <section id="courses" class="page">
+        <div class="hero"><div><h1>강의 정보</h1><p>등록된 강의, 공지, 과제와 자료를 확인하세요.</p></div></div>
+        <div class="toolbar">
+          <input class="input" id="courseSearch" placeholder="강의명 또는 교수명 검색" />
+          <select class="select" id="dayFilter"><option value="all">전체 요일</option><option>월</option><option>화</option><option>수</option><option>목</option><option>금</option></select>
+        </div>
+        <div id="courseGrid" class="course-grid"></div>
+        <div id="courseDetail" style="margin-top:20px"></div>
+      </section>
+
+      <section id="campus" class="page">
+        <div class="hero"><div><h1>캠퍼스맵</h1><p>수업과 연결된 건물을 샘플 지도에서 확인할 수 있습니다.</p></div></div>
+        <div class="notice-banner">※ 현재 캠퍼스맵은 프로토타입용 샘플 데이터입니다. 실제 서비스에서는 울산대학교 공식 지도 데이터로 교체됩니다.</div>
+        <div class="toolbar"><input class="input" id="buildingSearch" placeholder="건물 또는 강의실 검색" /></div>
+        <div class="map-layout">
+          <div class="card"><div class="section-head"><div class="section-title">건물 목록</div></div><div id="buildingList" class="building-list"></div><div id="buildingInfo" style="margin-top:16px"></div></div>
+          <div class="map-box" id="mapBox"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<nav class="mobile-nav" id="mobileNav">
+  <button data-page="dashboard" class="active">홈</button><button data-page="timetable">시간표</button><button data-page="courses">강의</button><button data-page="campus">지도</button>
+</nav>
+
+<div class="modal-backdrop" id="courseModal">
+  <div class="modal">
+    <h2 id="courseModalTitle">강의 추가</h2>
+    <form id="courseForm">
+      <input type="hidden" id="courseId" />
+      <div class="form-grid">
+        <div class="field full"><label>강의명</label><input class="input" id="courseName" required /></div>
+        <div class="field"><label>교수명</label><input class="input" id="courseProfessor" required /></div>
+        <div class="field"><label>요일</label><select class="select" id="courseDay"><option>월</option><option>화</option><option>수</option><option>목</option><option>금</option></select></div>
+        <div class="field"><label>시작 시간</label><input class="input" type="time" id="courseStart" value="09:00" required /></div>
+        <div class="field"><label>종료 시간</label><input class="input" type="time" id="courseEnd" value="10:30" required /></div>
+        <div class="field"><label>건물</label><select class="select" id="courseBuilding"></select></div>
+        <div class="field"><label>강의실</label><input class="input" id="courseRoom" placeholder="예: 302호" required /></div>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn ghost" id="cancelModal">취소</button><button type="submit" class="btn primary">저장</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="detailModal"><div class="modal"><div id="detailModalBody"></div><div class="modal-actions"><button class="btn ghost" id="closeDetail">닫기</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SAMPLE_COURSES = [
+  {id:'c1',name:'디자인론',professor:'김OO 교수',day:'월',startTime:'10:00',endTime:'12:00',room:'201호',buildingId:'b1',color:'#2d6ca2'},
+  {id:'c2',name:'영어 회화',professor:'이OO 교수',day:'화',startTime:'12:00',endTime:'13:30',room:'105호',buildingId:'b2',color:'#5a7d5a'},
+  {id:'c3',name:'게임디자인 2',professor:'박OO 교수',day:'수',startTime:'14:00',endTime:'17:00',room:'302호',buildingId:'b3',color:'#7a5aa6'},
+  {id:'c4',name:'인터랙션 디자인',professor:'최OO 교수',day:'목',startTime:'09:30',endTime:'12:00',room:'410호',buildingId:'b1',color:'#a35a5a'},
+  {id:'c5',name:'디지털 콘텐츠 스튜디오',professor:'정OO 교수',day:'금',startTime:'15:00',endTime:'17:00',room:'203호',buildingId:'b4',color:'#8a6a33'}
+];
+const BUILDINGS = [
+  {id:'b1',name:'샘플 A동',rooms:['201호','410호'],x:23,y:28,desc:'프로토타입용 가상 건물 표기입니다.'},
+  {id:'b2',name:'샘플 B동',rooms:['105호'],x:64,y:22,desc:'프로토타입용 가상 건물 표기입니다.'},
+  {id:'b3',name:'샘플 C동',rooms:['302호'],x:46,y:58,desc:'프로토타입용 가상 건물 표기입니다.'},
+  {id:'b4',name:'샘플 D동',rooms:['203호'],x:74,y:72,desc:'프로토타입용 가상 건물 표기입니다.'}
+];
+const NOTICES = [
+  {id:'n1',courseId:'c3',title:'중간 발표 일정 안내',date:'2026-10-10'},
+  {id:'n2',courseId:'c1',title:'과제 제출 안내',date:'2026-10-08'},
+  {id:'n3',courseId:'c4',title:'다음 주 강의실 변경 안내',date:'2026-10-07'},
+  {id:'n4',courseId:'c2',title:'참고자료 업로드 안내',date:'2026-10-05'}
+];
+const ASSIGNMENTS = [
+  {id:'a1',courseId:'c1',title:'리서치 과제',due:'2026-10-16'},
+  {id:'a2',courseId:'c3',title:'게임 기획서 초안',due:'2026-10-20'},
+  {id:'a3',courseId:'c2',title:'영어 발표 영상',due:'2026-10-23'},
+  {id:'a4',courseId:'c4',title:'인터랙션 리포트',due:'2026-10-28'}
+];
+const MATERIALS = [
+  {courseId:'c1',title:'1주차 강의자료'}, {courseId:'c3',title:'기획서 작성 참고자료'}, {courseId:'c4',title:'프로토타이핑 참고자료'}
+];
+const DAYS=['월','화','수','목','금'];
+let courses = loadCourses();
+let selectedBuildingId = 'b1';
+let selectedCourseId = null;
+
+function loadCourses(){
+  try{const s=localStorage.getItem('uou-student-courses-static');return s?JSON.parse(s):structuredClone(SAMPLE_COURSES)}catch{return JSON.parse(JSON.stringify(SAMPLE_COURSES))}
+}
+function saveCourses(){localStorage.setItem('uou-student-courses-static',JSON.stringify(courses))}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function toMinutes(t){const [h,m]=t.split(':').map(Number);return h*60+m}
+function getCourse(id){return courses.find(c=>c.id===id)}
+function getBuilding(id){return BUILDINGS.find(b=>b.id===id)}
+function dateKorean(d=new Date()){const week=['일','월','화','수','목','금','토'];return `${d.getMonth()+1}월 ${d.getDate()}일 ${week[d.getDay()]}요일`}
+function weekdayKorean(d=new Date()){return ['일','월','화','수','목','금','토'][d.getDay()]}
+function dday(dateStr){const today=new Date();today.setHours(0,0,0,0);const due=new Date(dateStr+'T00:00:00');const diff=Math.ceil((due-today)/86400000);return diff===0?'D-DAY':diff>0?`D-${diff}`:`D+${Math.abs(diff)}`}
+
+function navigate(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page));
+  document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  document.getElementById('topbarTitle').textContent={dashboard:'통합 학생 정보 플랫폼',timetable:'시간표',courses:'강의 정보',campus:'캠퍼스맵'}[page];
+  location.hash=page==='dashboard'?'':page;
+  renderAll();
+}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
+document.querySelectorAll('[data-jump]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.jump)));
+
+function renderDashboard(){
+  const now=new Date();document.getElementById('todayTitle').textContent=dateKorean(now);
+  const day=weekdayKorean(now);const todays=courses.filter(c=>c.day===day).sort((a,b)=>toMinutes(a.startTime)-toMinutes(b.startTime));
+  const sched=document.getElementById('todaySchedule');
+  sched.innerHTML=todays.length?todays.map(c=>`<div class="list-item clickable" onclick="openCourseDetail('${c.id}')"><div class="row"><strong>${c.startTime} · ${c.name}</strong><span class="pill">${c.room}</span></div><div class="meta">${c.professor} · ${c.endTime} 종료</div></div>`).join(''):'<div class="empty">오늘 예정된 수업이 없습니다.</div>';
+  const nowMin=now.getHours()*60+now.getMinutes();let active=todays.find(c=>toMinutes(c.startTime)<=nowMin && nowMin<toMinutes(c.endTime));let next=todays.find(c=>toMinutes(c.startTime)>nowMin);
+  const box=document.getElementById('nextClassCard');
+  if(active){box.innerHTML=`<div class="pill">현재 수업 중</div><div class="next-time">${active.name}</div><div>${active.startTime} - ${active.endTime}</div><div class="subtle" style="margin-top:10px">${active.room} · ${active.professor}</div><button class="btn ghost" style="margin-top:18px" onclick="openCourseDetail('${active.id}')">강의 정보 보기</button>`}
+  else if(next){const left=toMinutes(next.startTime)-nowMin;box.innerHTML=`<div class="pill">다음 수업</div><div class="next-time">${next.name}</div><div>${next.startTime} - ${next.endTime}</div><div class="subtle" style="margin-top:10px">${next.room} · ${next.professor}</div><div style="margin-top:18px;font-weight:800">수업 시작까지 ${Math.floor(left/60)?Math.floor(left/60)+'시간 ':''}${left%60}분</div>`}
+  else{box.innerHTML=`<div class="pill">오늘 일정</div><div class="next-time" style="font-size:26px">오늘 수업이 모두 끝났습니다.</div><div class="subtle">남은 과제와 공지를 확인해보세요.</div>`}
+  const a=[...ASSIGNMENTS].sort((x,y)=>x.due.localeCompare(y.due));
+  document.getElementById('assignmentList').innerHTML=a.map(x=>{const c=getCourse(x.courseId)||SAMPLE_COURSES.find(c=>c.id===x.courseId);return `<div class="list-item"><div class="row"><strong>${x.title}</strong><span class="dday">${dday(x.due)}</span></div><div class="meta">${c?c.name:'샘플 강의'} · 마감 ${x.due}</div></div>`}).join('');
+  document.getElementById('noticeList').innerHTML=NOTICES.map(n=>{const c=getCourse(n.courseId)||SAMPLE_COURSES.find(c=>c.id===n.courseId);return `<div class="list-item clickable" onclick="openCourseDetail('${n.courseId}')"><strong>${n.title}</strong><div class="meta">${c?c.name:'샘플 강의'} · ${n.date}</div></div>`}).join('');
+}
+
+function renderTimetable(){
+  const grid=document.getElementById('timetableGrid');
+  grid.innerHTML='<div class="time-head">시간</div>'+DAYS.map(d=>`<div class="day-head">${d}</div>`).join('');
+  const timeCol=document.createElement('div');timeCol.className='time-col';
+  for(let h=9;h<=18;h++){const top=(h-9)*80;timeCol.innerHTML+=`<div class="hour-line" style="top:${top}px"></div><div class="time-label" style="top:${top}px">${String(h).padStart(2,'0')}:00</div>`}
+  grid.appendChild(timeCol);
+  DAYS.forEach(day=>{
+    const col=document.createElement('div');col.className='day-col';
+    for(let h=9;h<=18;h++) col.innerHTML+=`<div class="hour-line" style="top:${(h-9)*80}px"></div>`;
+    courses.filter(c=>c.day===day).forEach(c=>{const start=(toMinutes(c.startTime)-9*60)/60*80;const height=(toMinutes(c.endTime)-toMinutes(c.startTime))/60*80;const el=document.createElement('div');el.className='course-block';el.style.top=Math.max(0,start)+'px';el.style.height=Math.max(40,height)+'px';el.style.background=c.color||'#2d6ca2';el.innerHTML=`<strong>${c.name}</strong>${c.startTime}-${c.endTime}<br>${c.room}`;el.onclick=()=>openCourseDetail(c.id);col.appendChild(el)});
+    grid.appendChild(col)
+  });
+}
+
+function renderCourses(){
+  const q=document.getElementById('courseSearch').value.trim().toLowerCase();const df=document.getElementById('dayFilter').value;
+  const list=courses.filter(c=>(df==='all'||c.day===df)&&(!q||c.name.toLowerCase().includes(q)||c.professor.toLowerCase().includes(q)));
+  const root=document.getElementById('courseGrid');
+  root.innerHTML=list.length?list.map(c=>{const n=NOTICES.filter(x=>x.courseId===c.id).length;const a=ASSIGNMENTS.filter(x=>x.courseId===c.id && !dday(x.due).startsWith('D+')).length;return `<div class="card course-card"><span class="pill">${c.day}요일</span><h3 style="margin-top:12px">${c.name}</h3><div class="meta">${c.professor}</div><div class="meta">${c.startTime} - ${c.endTime} · ${c.room}</div><div class="course-stat"><div class="stat"><strong>${n}</strong>공지</div><div class="stat"><strong>${a}</strong>남은 과제</div></div><div style="margin-top:14px;display:flex;gap:8px"><button class="btn primary" onclick="showCoursePageDetail('${c.id}')">상세 보기</button><button class="btn ghost" onclick="goToBuilding('${c.buildingId}')">위치 보기</button></div></div>`}).join(''):'<div class="empty">검색 결과가 없습니다. 다른 검색어를 입력해보세요.</div>';
+  if(selectedCourseId && getCourse(selectedCourseId)) showCoursePageDetail(selectedCourseId,false); else document.getElementById('courseDetail').innerHTML='';
+}
+
+document.getElementById('courseSearch').addEventListener('input',renderCourses);document.getElementById('dayFilter').addEventListener('change',renderCourses);
+
+function showCoursePageDetail(id,scroll=true){selectedCourseId=id;const c=getCourse(id);if(!c)return;const notices=NOTICES.filter(n=>n.courseId===id), assignments=ASSIGNMENTS.filter(a=>a.courseId===id), materials=MATERIALS.filter(m=>m.courseId===id);const b=getBuilding(c.buildingId);
+  document.getElementById('courseDetail').innerHTML=`<div class="card"><div class="section-head"><div><div class="section-title">${c.name}</div><div class="meta">${c.professor} · ${c.day} ${c.startTime}-${c.endTime} · ${b?b.name+' ':''}${c.room}</div></div><div style="display:flex;gap:8px"><button class="btn secondary" onclick="openCourseForm('${c.id}')">수정</button><button class="btn danger" onclick="deleteCourse('${c.id}')">삭제</button></div></div><div class="tabs"><button class="tab active" onclick="switchDetailTab(this,'detail-all')">전체</button><button class="tab" onclick="switchDetailTab(this,'detail-notices')">공지</button><button class="tab" onclick="switchDetailTab(this,'detail-assignments')">과제</button></div><div id="detail-all"><h3>공지사항</h3>${notices.length?notices.map(n=>`<div class="list-item" style="margin-top:8px"><strong>${n.title}</strong><div class="meta">${n.date}</div></div>`).join(''):'<div class="empty" style="margin-top:8px">공지사항이 없습니다.</div>'}<h3 style="margin-top:18px">과제</h3>${assignments.length?assignments.map(a=>`<div class="list-item" style="margin-top:8px"><div class="row"><strong>${a.title}</strong><span class="dday">${dday(a.due)}</span></div><div class="meta">마감 ${a.due}</div></div>`).join(''):'<div class="empty" style="margin-top:8px">과제가 없습니다.</div>'}<h3 style="margin-top:18px">강의 자료</h3>${materials.length?materials.map(m=>`<div class="list-item" style="margin-top:8px"><strong>${m.title}</strong><div class="meta">샘플 자료입니다. 실제 링크는 연결되지 않습니다.</div></div>`).join(''):'<div class="empty" style="margin-top:8px">등록된 샘플 자료가 없습니다.</div>'}</div><div id="detail-notices" style="display:none">${notices.length?notices.map(n=>`<div class="list-item"><strong>${n.title}</strong><div class="meta">${n.date}</div></div>`).join(''):'<div class="empty">공지사항이 없습니다.</div>'}</div><div id="detail-assignments" style="display:none">${assignments.length?assignments.map(a=>`<div class="list-item"><div class="row"><strong>${a.title}</strong><span class="dday">${dday(a.due)}</span></div><div class="meta">마감 ${a.due}</div></div>`).join(''):'<div class="empty">과제가 없습니다.</div>'}</div></div>`;
+  if(scroll) document.getElementById('courseDetail').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function switchDetailTab(btn,target){btn.parentElement.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');['detail-all','detail-notices','detail-assignments'].forEach(id=>document.getElementById(id).style.display=id===target?'block':'none')}
+
+function renderBuildings(){
+  const q=document.getElementById('buildingSearch').value.trim().toLowerCase();const filtered=BUILDINGS.filter(b=>!q||b.name.toLowerCase().includes(q)||b.rooms.some(r=>r.toLowerCase().includes(q)));
+  document.getElementById('buildingList').innerHTML=filtered.length?filtered.map(b=>`<button class="building-item ${b.id===selectedBuildingId?'active':''}" onclick="selectBuilding('${b.id}')"><strong>${b.name}</strong><div class="meta">${b.rooms.join(', ')}</div></button>`).join(''):'<div class="empty">검색 결과가 없습니다.</div>';
+  const map=document.getElementById('mapBox');map.innerHTML='<div style="position:absolute;left:14px;top:14px" class="demo-badge">샘플 지도</div>'+BUILDINGS.map(b=>`<button class="map-label ${b.id===selectedBuildingId?'active':''}" style="left:${b.x}%;top:${b.y}%" onclick="selectBuilding('${b.id}')">${b.name}</button>`).join('');
+  const b=getBuilding(selectedBuildingId);if(!b){document.getElementById('buildingInfo').innerHTML='';return}const linked=courses.filter(c=>c.buildingId===b.id);document.getElementById('buildingInfo').innerHTML=`<div class="list-item"><strong>${b.name}</strong><div class="meta">${b.desc}</div><div style="margin-top:10px"><strong>연결된 강의실</strong><div class="meta">${b.rooms.join(', ')}</div></div><div style="margin-top:10px"><strong>이 건물의 내 수업</strong><div class="meta">${linked.length?linked.map(c=>c.name).join(', '):'없음'}</div></div></div>`;
+}
+document.getElementById('buildingSearch').addEventListener('input',renderBuildings);
+function selectBuilding(id){selectedBuildingId=id;renderBuildings()}
+function goToBuilding(id){selectedBuildingId=id||BUILDINGS[0].id;navigate('campus')}
+
+function openCourseDetail(id){const c=getCourse(id);if(!c)return;const b=getBuilding(c.buildingId);document.getElementById('detailModalBody').innerHTML=`<h2>${c.name}</h2><div class="list"><div class="list-item"><strong>교수</strong><div class="meta">${c.professor}</div></div><div class="list-item"><strong>시간</strong><div class="meta">${c.day}요일 ${c.startTime} - ${c.endTime}</div></div><div class="list-item"><strong>강의실</strong><div class="meta">${b?b.name+' ':''}${c.room}</div></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px"><button class="btn primary" onclick="closeDetailModal();navigate('courses');showCoursePageDetail('${c.id}')">강의 상세 보기</button><button class="btn ghost" onclick="closeDetailModal();goToBuilding('${c.buildingId}')">위치 보기</button><button class="btn secondary" onclick="closeDetailModal();openCourseForm('${c.id}')">수정</button><button class="btn danger" onclick="closeDetailModal();deleteCourse('${c.id}')">삭제</button></div>`;document.getElementById('detailModal').classList.add('show')}
+function closeDetailModal(){document.getElementById('detailModal').classList.remove('show')}
+document.getElementById('closeDetail').onclick=closeDetailModal;document.getElementById('detailModal').addEventListener('click',e=>{if(e.target.id==='detailModal')closeDetailModal()});
+
+function openCourseForm(id){
+  const modal=document.getElementById('courseModal');const c=id?getCourse(id):null;document.getElementById('courseModalTitle').textContent=c?'강의 수정':'강의 추가';document.getElementById('courseId').value=c?.id||'';document.getElementById('courseName').value=c?.name||'';document.getElementById('courseProfessor').value=c?.professor||'';document.getElementById('courseDay').value=c?.day||'월';document.getElementById('courseStart').value=c?.startTime||'09:00';document.getElementById('courseEnd').value=c?.endTime||'10:30';document.getElementById('courseBuilding').value=c?.buildingId||BUILDINGS[0].id;document.getElementById('courseRoom').value=c?.room||'';modal.classList.add('show')
+}
+function closeCourseForm(){document.getElementById('courseModal').classList.remove('show')}
+document.getElementById('addCourseBtn').onclick=()=>openCourseForm();document.getElementById('cancelModal').onclick=closeCourseForm;document.getElementById('courseModal').addEventListener('click',e=>{if(e.target.id==='courseModal')closeCourseForm()});
+document.getElementById('courseForm').addEventListener('submit',e=>{e.preventDefault();const id=document.getElementById('courseId').value;const start=document.getElementById('courseStart').value;const end=document.getElementById('courseEnd').value;if(toMinutes(end)<=toMinutes(start)){alert('종료 시간은 시작 시간보다 늦어야 합니다.');return}const data={id:id||'c'+Date.now(),name:document.getElementById('courseName').value.trim(),professor:document.getElementById('courseProfessor').value.trim(),day:document.getElementById('courseDay').value,startTime:start,endTime:end,buildingId:document.getElementById('courseBuilding').value,room:document.getElementById('courseRoom').value.trim(),color:id?(getCourse(id)?.color||'#2d6ca2'):['#2d6ca2','#5a7d5a','#7a5aa6','#a35a5a','#8a6a33'][Math.floor(Math.random()*5)]};if(id){courses=courses.map(c=>c.id===id?data:c);showToast('강의가 수정되었습니다.')}else{courses.push(data);showToast('강의가 추가되었습니다.')}saveCourses();closeCourseForm();renderAll()});
+function deleteCourse(id){const c=getCourse(id);if(!c)return;if(confirm(`'${c.name}' 강의를 삭제하시겠습니까?`)){courses=courses.filter(x=>x.id!==id);if(selectedCourseId===id)selectedCourseId=null;saveCourses();showToast('강의가 삭제되었습니다.');renderAll()}}
+document.getElementById('resetCoursesBtn').onclick=()=>{if(confirm('시간표를 샘플 데이터로 초기화하시겠습니까?')){courses=JSON.parse(JSON.stringify(SAMPLE_COURSES));saveCourses();showToast('샘플 시간표로 초기화되었습니다.');renderAll()}};
+
+function renderAll(){renderDashboard();renderTimetable();renderCourses();renderBuildings()}
+function init(){document.getElementById('courseBuilding').innerHTML=BUILDINGS.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');const hash=location.hash.replace('#','');navigate(['timetable','courses','campus'].includes(hash)?hash:'dashboard');setInterval(renderDashboard,60000)}
+init();
+</script>
+</body>
+</html>
